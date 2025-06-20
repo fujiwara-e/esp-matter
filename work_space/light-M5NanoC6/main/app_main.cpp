@@ -21,6 +21,7 @@
 #include <esp_matter.h>
 #include <esp_matter_console.h>
 #include <esp_matter_ota.h>
+#include <esp_matter_providers.h>
 
 #include <app_priv.h>
 #include <app_reset.h>
@@ -32,6 +33,7 @@
 
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/Server.h>
+#include <custom_provider/dynamic_commissionable_data_provider.h>
 
 static const char *TAG = "app_main";
 uint16_t light_endpoint_id = 0;
@@ -40,6 +42,10 @@ uint16_t light_endpoint_id = 0;
 #define WIFI_SSID ""
 #define WIFI_PASS ""
 #define WIFI_MAXIMUM_RETRY 10
+
+#if CONFIG_DYNAMIC_PASSCODE_COMMISSIONABLE_DATA_PROVIDER
+dynamic_commissionable_data_provider g_dynamic_passcode_provider;
+#endif
 
 static int s_retry_num = 0;
 static EventGroupHandle_t s_wifi_event_group;
@@ -300,6 +306,11 @@ extern "C" void app_main()
     set_openthread_platform_config(&config);
 #endif
 
+#if CONFIG_DYNAMIC_PASSCODE_COMMISSIONABLE_DATA_PROVIDER
+    /* This should be called before esp_matter::start() */
+    esp_matter::set_custom_commissionable_data_provider(&g_dynamic_passcode_provider);
+
+#endif
     /* Matter start */
     err = esp_matter::start(app_event_cb);
     ABORT_APP_ON_FAILURE(err == ESP_OK, ESP_LOGE(TAG, "Failed to start Matter, err:%d", err));
