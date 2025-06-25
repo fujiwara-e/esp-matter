@@ -39,8 +39,8 @@ static const char *TAG = "app_main";
 uint16_t light_endpoint_id = 0;
 
 // WiFi configuration
-#define WIFI_SSID ""
-#define WIFI_PASS ""
+#define WIFI_SSID CONFIG_EXAMPLE_WIFI_SSID
+#define WIFI_PASS CONFIG_EXAMPLE_WIFI_PASSWORD
 #define WIFI_MAXIMUM_RETRY 10
 
 #if CONFIG_DYNAMIC_PASSCODE_COMMISSIONABLE_DATA_PROVIDER
@@ -325,7 +325,7 @@ extern "C" void app_main()
 
 #if CONFIG_ENABLE_CHIP_SHELL
     esp_matter::console::diagnostics_register_commands();
-    esp_matter::console::wifi_register_commands();
+    // esp_matter::console::wifi_register_commands();
     esp_matter::console::factoryreset_register_commands();
 #if CONFIG_OPENTHREAD_CLI
     esp_matter::console::otcli_register_commands();

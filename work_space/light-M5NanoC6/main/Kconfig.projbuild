@@ -1,5 +1,19 @@
 menu "Example Configuration"
-    visible if CUSTOM_COMMISSIONABLE_DATA_PROVIDER
+
+    config EXAMPLE_WIFI_SSID
+        string "WiFi SSID"
+        default "myssid"
+        help
+            SSID (network name) for the example to connect to.
+
+    config EXAMPLE_WIFI_PASSWORD
+        string "WiFi Password"
+        default "mypassword"
+        help
+            WiFi password (WPA or WPA2) for the example to use.
+
+    menu "Dynamic Passcode Configuration"
+        visible if CUSTOM_COMMISSIONABLE_DATA_PROVIDER
 
     config DYNAMIC_PASSCODE_COMMISSIONABLE_DATA_PROVIDER
         bool "Enable Dynamic Passcode Commissionable Data Provider"
@@ -28,5 +42,7 @@ menu "Example Configuration"
         default "0NHS09TV1tfY2drb3N3e36ChoqOkpaanqKmqq6ytrq8="
         help
             Fixed salt in custom dynamic passcode commissionable data provider. It should be a Base64-Encoded string.
+
+    endmenu
 
 endmenu
