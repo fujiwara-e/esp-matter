@@ -95,7 +95,22 @@ CHIP_ERROR dynamic_commissionable_data_provider::GetSpake2pVerifier(MutableByteS
 CHIP_ERROR dynamic_commissionable_data_provider::GetSetupPasscode(uint32_t &setupPasscode)
 {
     if (mSetupPasscode == 0) {
-        ReturnErrorOnFailure(GenerateRandomPasscode(mSetupPasscode));
+        // Check if a fixed passcode is configured
+        uint32_t configuredPasscode = CONFIG_DYNAMIC_PASSCODE_PROVIDER_PASSCODE;
+        if (configuredPasscode != 0) {
+            // Use the configured passcode
+            if (chip::SetupPayload::IsValidSetupPIN(configuredPasscode)) {
+                mSetupPasscode = configuredPasscode;
+                ESP_LOGI(TAG, "Using configured setup passcode: %lu", (unsigned long)mSetupPasscode);
+            } else {
+                ESP_LOGE(TAG, "Configured passcode %lu is invalid, generating random passcode",
+                         (unsigned long)configuredPasscode);
+                ReturnErrorOnFailure(GenerateRandomPasscode(mSetupPasscode));
+            }
+        } else {
+            // Generate a random passcode
+            ReturnErrorOnFailure(GenerateRandomPasscode(mSetupPasscode));
+        }
     }
     setupPasscode = mSetupPasscode;
     return CHIP_NO_ERROR;
@@ -111,5 +126,6 @@ CHIP_ERROR dynamic_commissionable_data_provider::GenerateRandomPasscode(uint32_t
         // 77777777, 88888888, 12345678, 87654321), increase it by 1 to make it valid.
         passcode = passcode + 1;
     }
+    ESP_LOGI(TAG, "Generated random setup passcode: %lu", (unsigned long)passcode);
     return CHIP_NO_ERROR;
 }
